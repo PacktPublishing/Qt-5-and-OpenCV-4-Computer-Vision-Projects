@@ -1,0 +1,9 @@
+*.o
+*.so
+moc_*
+.qmake.stash
+
+# ch01
+Chapter-01/ImageViewer/ImageViewer
+Chapter-01/ImageViewer/Makefile
+
