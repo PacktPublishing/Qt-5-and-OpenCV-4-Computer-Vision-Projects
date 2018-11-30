@@ -4,8 +4,12 @@
 #include <QPixmap>
 #include <QKeyEvent>
 #include <QDebug>
+
+#include "opencv2/opencv.hpp"
+
 #include "mainwindow.h"
 
+using namespace cv;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -26,10 +30,12 @@ void MainWindow::initUI()
     // setup menubar
     fileMenu = menuBar()->addMenu("&File");
     viewMenu = menuBar()->addMenu("&View");
+    editMenu = menuBar()->addMenu("&Edit");
 
     // setup toolbar
     fileToolBar = addToolBar("File");
     viewToolBar = addToolBar("View");
+    editToolBar = addToolBar("Edit");
 
 
     // main area for image display
@@ -83,6 +89,12 @@ void MainWindow::createActions()
     connect(nextAction, SIGNAL(triggered(bool)), this, SLOT(nextImage()));
 
     setupShortcuts();
+
+    // the edit actions
+    blurAction = new QAction("Blur", this);
+    editMenu->addAction(blurAction);
+    editToolBar->addAction(blurAction);
+    connect(blurAction, SIGNAL(triggered(bool)), this, SLOT(blurImage()));
 }
 
 void MainWindow::openImage()
@@ -193,4 +205,37 @@ void MainWindow::setupShortcuts()
     shortcuts.clear();
     shortcuts << Qt::Key_Down << Qt::Key_Right;
     nextAction->setShortcuts(shortcuts);
+}
+
+
+void MainWindow::blurImage()
+{
+    if (currentImage == nullptr) {
+        QMessageBox::information(this, "Information", "No image to edit.");
+        return;
+    }
+    QPixmap pixmap = currentImage->pixmap();
+    QImage image = pixmap.toImage();
+    image = image.convertToFormat(QImage::Format_RGB888);
+    Mat mat = Mat(
+        image.height(),
+        image.width(),
+        CV_8UC3,
+        image.bits(),
+        image.bytesPerLine());
+    blur(mat, mat, Size(8, 8));
+    QImage image_blurred(
+        mat.data,
+        mat.cols,
+        mat.rows,
+        QImage::Format_RGB888);
+    pixmap = QPixmap::fromImage(image_blurred);
+    imageScene->clear();
+    imageView->resetMatrix();
+    currentImage = imageScene->addPixmap(pixmap);
+    imageScene->update();
+    imageView->setSceneRect(pixmap.rect());
+    QString status = QString("(editted image), %1x%2")
+        .arg(pixmap.width()).arg(pixmap.height());
+    mainStatusLabel->setText(status);
 }

@@ -32,13 +32,17 @@ private slots:
     void prevImage();
     void nextImage();
     void saveAs();
+    // for editting
+    void blurImage();
 
 private:
     QMenu *fileMenu;
     QMenu *viewMenu;
+    QMenu *editMenu;
 
     QToolBar *fileToolBar;
     QToolBar *viewToolBar;
+    QToolBar *editToolBar;
 
     QGraphicsScene *imageScene;
     QGraphicsView *imageView;
@@ -53,6 +57,8 @@ private:
     QAction *zoomOutAction;
     QAction *prevAction;
     QAction *nextAction;
+
+    QAction *blurAction;
 
     QString currentImagePath;
     QGraphicsPixmapItem *currentImage;

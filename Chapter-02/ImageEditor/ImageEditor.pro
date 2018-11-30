@@ -10,6 +10,22 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 INCLUDEPATH += .
 
+# use your own path in the following config
+unix: !mac {
+    INCLUDEPATH += /home/kdr2/programs/opencv/include/opencv4
+    LIBS += -L/home/kdr2/programs/opencv/lib -lopencv_core -l opencv_imgproc
+}
+
+unix: mac {
+    INCLUDEPATH += /path/to/opencv/include/opencv4
+    LIBS += -L/path/to/opencv/lib -lopencv_world
+}
+
+win32 {
+    INCLUDEPATH += c:/path/to/opencv/include/opencv4
+    LIBS += -lc:/path/to/opencv/lib/opencv_world
+}
+
 # The following define makes your compiler warn you if you use any
 # feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
