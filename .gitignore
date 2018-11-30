@@ -1,5 +1,8 @@
 *.o
 *.so
+*.so.1
+*.so.1.0
+*.so.1.0.0
 moc_*
 .qmake.stash
 
@@ -9,4 +12,4 @@ Chapter-01/ImageViewer/Makefile
 # ch02
 Chapter-02/ImageEditor/ImageEditor
 Chapter-02/ImageEditor/Makefile
-
+Chapter-02/ErodePlugin/Makefile

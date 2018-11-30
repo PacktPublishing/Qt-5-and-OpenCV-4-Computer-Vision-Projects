@@ -4,6 +4,7 @@
 #include <QPixmap>
 #include <QKeyEvent>
 #include <QDebug>
+#include <QPluginLoader>
 
 #include "opencv2/opencv.hpp"
 
@@ -18,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     , currentImage(nullptr)
 {
     initUI();
+    loadPlugins();
 }
 
 MainWindow::~MainWindow()
@@ -230,6 +232,73 @@ void MainWindow::blurImage()
         mat.rows,
         QImage::Format_RGB888);
     pixmap = QPixmap::fromImage(image_blurred);
+    imageScene->clear();
+    imageView->resetMatrix();
+    currentImage = imageScene->addPixmap(pixmap);
+    imageScene->update();
+    imageView->setSceneRect(pixmap.rect());
+    QString status = QString("(editted image), %1x%2")
+        .arg(pixmap.width()).arg(pixmap.height());
+    mainStatusLabel->setText(status);
+}
+
+
+void MainWindow::loadPlugins()
+{
+    QDir pluginsDir(QApplication::instance()->applicationDirPath() + "/plugins");
+    QStringList nameFilters;
+    nameFilters << "*.so" << "*.dylib" << "*.dll";
+    QFileInfoList plugins = pluginsDir.entryInfoList(
+        nameFilters, QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
+    foreach(QFileInfo plugin, plugins) {
+        QPluginLoader pluginLoader(plugin.absoluteFilePath(), this);
+        EditorPluginInterface *plugin_ptr = dynamic_cast<EditorPluginInterface*>(pluginLoader.instance());
+        if(plugin_ptr) {
+            QAction *action = new QAction(plugin_ptr->name());
+            editMenu->addAction(action);
+            editToolBar->addAction(action);
+            editPlugins[plugin_ptr->name()] = plugin_ptr;
+            connect(action, SIGNAL(triggered(bool)), this, SLOT(pluginPerform()));
+            // pluginLoader.unload();
+        } else {
+            qDebug() << "bad plugin: " << plugin.absoluteFilePath();
+        }
+    }
+}
+
+
+void MainWindow::pluginPerform()
+{
+    if (currentImage == nullptr) {
+        QMessageBox::information(this, "Information", "No image to edit.");
+        return;
+    }
+
+    QAction *active_action = qobject_cast<QAction*>(sender());
+    EditorPluginInterface *plugin_ptr = editPlugins[active_action->text()];
+    if(!plugin_ptr) {
+        QMessageBox::information(this, "Information", "No plugin is found.");
+        return;
+    }
+
+    QPixmap pixmap = currentImage->pixmap();
+    QImage image = pixmap.toImage();
+    image = image.convertToFormat(QImage::Format_RGB888);
+    Mat mat = Mat(
+        image.height(),
+        image.width(),
+        CV_8UC3,
+        image.bits(),
+        image.bytesPerLine());
+
+    plugin_ptr->edit(mat, mat);
+
+    QImage image_edited(
+        mat.data,
+        mat.cols,
+        mat.rows,
+        QImage::Format_RGB888);
+    pixmap = QPixmap::fromImage(image_edited);
     imageScene->clear();
     imageView->resetMatrix();
     currentImage = imageScene->addPixmap(pixmap);
