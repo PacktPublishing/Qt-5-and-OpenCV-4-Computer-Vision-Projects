@@ -11,5 +11,4 @@ Chapter-01/ImageViewer/ImageViewer
 Chapter-01/ImageViewer/Makefile
 # ch02
 Chapter-02/ImageEditor/ImageEditor
-Chapter-02/ImageEditor/Makefile
-Chapter-02/ErodePlugin/Makefile
+Chapter-02/*/Makefile
