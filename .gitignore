@@ -1,4 +1,5 @@
 *.o
+*.out
 *.so
 *.so.1
 *.so.1.0
@@ -12,3 +13,6 @@ Chapter-01/ImageViewer/Makefile
 # ch02
 Chapter-02/ImageEditor/ImageEditor
 Chapter-02/*/Makefile
+# ch03
+Chapter-03/Gazer/Gazer
+Chapter-03/*/Makefile
