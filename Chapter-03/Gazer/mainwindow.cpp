@@ -83,10 +83,12 @@ void MainWindow::initUI()
 void MainWindow::createActions()
 {
     // create actions, add them to menus
-    openCameraAction = new QAction("&Open Camera", this);
-    fileMenu->addAction(openCameraAction);
     cameraInfoAction = new QAction("Camera &Information", this);
     fileMenu->addAction(cameraInfoAction);
+    openCameraAction = new QAction("&Open Camera", this);
+    fileMenu->addAction(openCameraAction);
+    calcFPSAction = new QAction("&Calculate FPS", this);
+    fileMenu->addAction(calcFPSAction);
     exitAction = new QAction("E&xit", this);
     fileMenu->addAction(exitAction);
 
@@ -94,6 +96,7 @@ void MainWindow::createActions()
     connect(exitAction, SIGNAL(triggered(bool)), QApplication::instance(), SLOT(quit()));
     connect(cameraInfoAction, SIGNAL(triggered(bool)), this, SLOT(showCameraInfo()));
     connect(openCameraAction, SIGNAL(triggered(bool)), this, SLOT(openCamera()));
+    connect(calcFPSAction, SIGNAL(triggered(bool)), this, SLOT(calculateFPS()));
 }
 
 void MainWindow::showCameraInfo()
@@ -121,6 +124,7 @@ void MainWindow::openCamera()
         // if a thread is already running, stop it
         capturer->setRunning(false);
         disconnect(capturer, &CaptureThread::frameCaptured, this, &MainWindow::updateFrame);
+        disconnect(capturer, &CaptureThread::fpsChanged, this, &MainWindow::updateFPS);
         connect(capturer, &CaptureThread::finished, capturer, &CaptureThread::deleteLater);
     }
     // I am using my second camera whose Index is 2.  Usually, the
@@ -128,10 +132,18 @@ void MainWindow::openCamera()
     int camID = 2;
     capturer = new CaptureThread(camID, data_lock);
     connect(capturer, &CaptureThread::frameCaptured, this, &MainWindow::updateFrame);
+    connect(capturer, &CaptureThread::fpsChanged, this, &MainWindow::updateFPS);
     capturer->start();
     mainStatusLabel->setText(QString("Capturing Camera %1").arg(camID));
 }
 #endif
+
+void MainWindow::calculateFPS()
+{
+    if(capturer != nullptr) {
+        capturer->startCalcFPS();
+    }
+}
 
 void MainWindow::updateFrame(cv::Mat *mat)
 {
@@ -151,4 +163,9 @@ void MainWindow::updateFrame(cv::Mat *mat)
     imageScene->addPixmap(image);
     imageScene->update();
     imageView->setSceneRect(image.rect());
+}
+
+void MainWindow::updateFPS(int fps)
+{
+    mainStatusLabel->setText(QString("FPS of current camera is %1").arg(fps));
 }

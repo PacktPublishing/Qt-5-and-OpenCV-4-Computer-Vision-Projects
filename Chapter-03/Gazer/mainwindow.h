@@ -39,12 +39,15 @@ private slots:
     void showCameraInfo();
     void openCamera();
     void updateFrame(cv::Mat*);
+    void calculateFPS();
+    void updateFPS(int);
 
 private:
     QMenu *fileMenu;
 
-    QAction *openCameraAction;
     QAction *cameraInfoAction;
+    QAction *openCameraAction;
+    QAction *calcFPSAction;
     QAction *exitAction;
 
     QGraphicsScene *imageScene;

@@ -16,12 +16,17 @@ public:
     explicit CaptureThread(QString videoPath, QMutex *lock);
     ~CaptureThread();
     void setRunning(bool run) {running = run; };
+    void startCalcFPS() {fps_calculating = true; };
 
 protected:
     void run() override;
 
 signals:
     void frameCaptured(cv::Mat *data);
+    void fpsChanged(int fps);
+
+private:
+    void calculateFPS(cv::VideoCapture &cap);
 
 private:
     bool running;
@@ -29,6 +34,10 @@ private:
     QString videoPath;
     QMutex *data_lock;
     cv::Mat frame;
+
+    // FPS calculating
+    bool fps_calculating;
+    int fps;
 };
 
 #endif // CAPTURE_THREAD_H
