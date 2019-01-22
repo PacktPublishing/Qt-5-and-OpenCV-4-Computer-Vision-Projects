@@ -13,6 +13,7 @@
 #include <QPushButton>
 #include <QGraphicsPixmapItem>
 #include <QMutex>
+#include <QStandardItemModel>
 
 #ifdef GAZER_USE_QT_CAMERA
 #include <QCameraViewfinder>
@@ -34,6 +35,7 @@ public:
 private:
     void initUI();
     void createActions();
+    void populateSavedList();
 
 private slots:
     void showCameraInfo();
@@ -41,6 +43,8 @@ private slots:
     void updateFrame(cv::Mat*);
     void calculateFPS();
     void updateFPS(int);
+    void recordingStartStop();
+    void appendSavedVideo(QString name);
 
 private:
     QMenu *fileMenu;
@@ -62,6 +66,7 @@ private:
     QPushButton *recordButton;
 
     QListView *saved_list;
+    QStandardItemModel *list_model;
 
     QStatusBar *mainStatusBar;
     QLabel *mainStatusLabel;

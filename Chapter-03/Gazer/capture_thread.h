@@ -7,6 +7,7 @@
 #include <QMutex>
 
 #include "opencv2/opencv.hpp"
+#include "opencv2/videoio.hpp"
 
 class CaptureThread : public QThread
 {
@@ -17,6 +18,14 @@ public:
     ~CaptureThread();
     void setRunning(bool run) {running = run; };
     void startCalcFPS() {fps_calculating = true; };
+    enum VideoSavingStatus {
+                            STARTING,
+                            STARTED,
+                            STOPPING,
+                            STOPPED
+    };
+
+    void setVideoSavingStatus(VideoSavingStatus status) {video_saving_status = status; };
 
 protected:
     void run() override;
@@ -24,9 +33,12 @@ protected:
 signals:
     void frameCaptured(cv::Mat *data);
     void fpsChanged(int fps);
+    void videoSaved(QString name);
 
 private:
     void calculateFPS(cv::VideoCapture &cap);
+    void startSavingVideo(cv::Mat &firstFrame);
+    void stopSavingVideo();
 
 private:
     bool running;
@@ -38,6 +50,12 @@ private:
     // FPS calculating
     bool fps_calculating;
     int fps;
+
+    // video saving
+    int frame_width, frame_height;
+    VideoSavingStatus video_saving_status;
+    QString saved_video_name;
+    cv::VideoWriter *video_writer;
 };
 
 #endif // CAPTURE_THREAD_H

@@ -7,7 +7,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 unix: !mac {
     INCLUDEPATH += /home/kdr2/programs/opencv/include/opencv4
-    LIBS += -L/home/kdr2/programs/opencv/lib -lopencv_core -lopencv_imgproc  -lopencv_videoio -lopencv_videoio
+    LIBS += -L/home/kdr2/programs/opencv/lib -lopencv_core -lopencv_imgproc -lopencv_imgcodecs -lopencv_video -lopencv_videoio
 }
 
 unix: mac {
@@ -22,8 +22,8 @@ win32 {
 
 
 # Input
-HEADERS += mainwindow.h capture_thread.h
-SOURCES += main.cpp mainwindow.cpp capture_thread.cpp
+HEADERS += mainwindow.h capture_thread.h utilities.h
+SOURCES += main.cpp mainwindow.cpp capture_thread.cpp utilities.cpp
 
 # Using OpenCV or QCamera
 # DEFINES += GAZER_USE_QT_CAMERA=1
