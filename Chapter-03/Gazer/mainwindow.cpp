@@ -61,6 +61,7 @@ void MainWindow::initUI()
     monitorCheckBox = new QCheckBox(this);
     monitorCheckBox->setText("Monitor On/Off");
     tools_layout->addWidget(monitorCheckBox, 0, 0);
+    connect(monitorCheckBox, SIGNAL(stateChanged(int)), this, SLOT(updateMonitorStatus(int)));
 
     recordButton = new QPushButton(this);
     recordButton->setText("Record");
@@ -149,6 +150,9 @@ void MainWindow::openCamera()
     connect(capturer, &CaptureThread::videoSaved, this, &MainWindow::appendSavedVideo);
     capturer->start();
     mainStatusLabel->setText(QString("Capturing Camera %1").arg(camID));
+    monitorCheckBox->setCheckState(Qt::Unchecked);
+    recordButton->setText("Record");
+    recordButton->setEnabled(true);
 }
 #endif
 
@@ -190,9 +194,12 @@ void MainWindow::recordingStartStop() {
     if(text == "Record" && capturer != nullptr) {
         capturer->setVideoSavingStatus(CaptureThread::STARTING);
         recordButton->setText("Stop Recording");
+        monitorCheckBox->setCheckState(Qt::Unchecked);
+        monitorCheckBox->setEnabled(false);
     } else if(text == "Stop Recording" && capturer != nullptr) {
         capturer->setVideoSavingStatus(CaptureThread::STOPPING);
         recordButton->setText("Record");
+        monitorCheckBox->setEnabled(true);
     }
 }
 
@@ -224,4 +231,18 @@ void MainWindow::appendSavedVideo(QString name)
     list_model->setData(index, QPixmap(cover).scaledToHeight(145), Qt::DecorationRole);
     list_model->setData(index, name, Qt::DisplayRole);
     saved_list->scrollTo(index);
+}
+
+void MainWindow::updateMonitorStatus(int status)
+{
+    if(capturer == nullptr) {
+        return;
+    }
+    if(status) {
+        capturer->setMotionDetectingStatus(true);
+        recordButton->setEnabled(false);
+    } else {
+        capturer->setMotionDetectingStatus(false);
+        recordButton->setEnabled(true);
+    }
 }

@@ -1,4 +1,5 @@
 #include <QTime>
+#include <QDebug>
 
 #include "utilities.h"
 #include "capture_thread.h"
@@ -13,6 +14,8 @@ CaptureThread::CaptureThread(int camera, QMutex *lock):
     video_saving_status = STOPPED;
     saved_video_name = "";
     video_writer = nullptr;
+
+    motion_detecting_status = false;
 }
 
 CaptureThread::CaptureThread(QString videoPath, QMutex *lock):
@@ -25,6 +28,8 @@ CaptureThread::CaptureThread(QString videoPath, QMutex *lock):
     video_saving_status = STOPPED;
     saved_video_name = "";
     video_writer = nullptr;
+
+    motion_detecting_status = false;
 }
 
 CaptureThread::~CaptureThread() {
@@ -33,17 +38,22 @@ CaptureThread::~CaptureThread() {
 void CaptureThread::run() {
     running = true;
     cv::VideoCapture cap(cameraID);
+    // cv::VideoCapture cap("/home/kdr2/Videos/WIN_20190123_20_14_56_Pro.mp4");
     cv::Mat tmp_frame;
 
     frame_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
     frame_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+
+    segmentor = cv::createBackgroundSubtractorMOG2(500, 16, true);
 
     while(running) {
         cap >> tmp_frame;
         if (tmp_frame.empty()) {
             break;
         }
-
+        if(motion_detecting_status) {
+            motionDetect(frame);
+        }
         if(video_saving_status == STARTING) {
             startSavingVideo(frame);
         }
@@ -106,4 +116,42 @@ void CaptureThread::stopSavingVideo()
     delete video_writer;
     video_writer = nullptr;
     emit videoSaved(saved_video_name);
+}
+
+void CaptureThread::motionDetect(cv::Mat &frame)
+{
+    cv::Mat fgmask;
+    segmentor->apply(frame, fgmask);
+    if (fgmask.empty()) {
+            return;
+    }
+
+    cv::threshold(fgmask, fgmask, 25, 255, cv::THRESH_BINARY);
+
+    int noise_size = 9;
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(noise_size, noise_size));
+    cv::erode(fgmask, fgmask, kernel);
+    kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(noise_size, noise_size));
+    cv::dilate(fgmask, fgmask, kernel, cv::Point(-1,-1), 3);
+
+    vector<vector<cv::Point> > contours;
+    cv::findContours(fgmask, contours, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+
+    bool has_motion = contours.size() > 0;
+    if(!motion_detected && has_motion) {
+        motion_detected = true;
+        setVideoSavingStatus(STARTING);
+        qDebug() << "new motion detected, should send a notification.";
+    } else if (motion_detected && !has_motion) {
+        motion_detected = false;
+        setVideoSavingStatus(STOPPING);
+        qDebug() << "detected motion disappeared.";
+    }
+
+    cv::Scalar color = cv::Scalar(0, 0, 255); // red
+    for(size_t i = 0; i < contours.size(); i++) {
+        cv::Rect rect = cv::boundingRect(contours[i]);
+        cv::rectangle(frame, rect, color, 1);
+        //cv::drawContours(frame, contours, (int)i, color, 1);
+    }
 }

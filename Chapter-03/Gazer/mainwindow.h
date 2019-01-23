@@ -45,6 +45,7 @@ private slots:
     void updateFPS(int);
     void recordingStartStop();
     void appendSavedVideo(QString name);
+    void updateMonitorStatus(int status);
 
 private:
     QMenu *fileMenu;
