@@ -2,7 +2,7 @@ TEMPLATE = app
 TARGET = Gazer
 INCLUDEPATH += .
 
-QT += core gui multimedia
+QT += core gui multimedia network concurrent
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 unix: !mac {

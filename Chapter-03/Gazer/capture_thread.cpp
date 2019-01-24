@@ -1,4 +1,5 @@
 #include <QTime>
+#include <QtConcurrent>
 #include <QDebug>
 
 #include "utilities.h"
@@ -142,6 +143,7 @@ void CaptureThread::motionDetect(cv::Mat &frame)
         motion_detected = true;
         setVideoSavingStatus(STARTING);
         qDebug() << "new motion detected, should send a notification.";
+        QtConcurrent::run(Utilities::notifyMobile, cameraID);
     } else if (motion_detected && !has_motion) {
         motion_detected = false;
         setVideoSavingStatus(STOPPING);
