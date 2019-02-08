@@ -15,11 +15,6 @@
 #include <QMutex>
 #include <QStandardItemModel>
 
-#ifdef GAZER_USE_QT_CAMERA
-#include <QCameraViewfinder>
-#include <QCamera>
-#endif
-
 #include "opencv2/opencv.hpp"
 
 #include "capture_thread.h"
@@ -41,30 +36,19 @@ private slots:
     void showCameraInfo();
     void openCamera();
     void updateFrame(cv::Mat*);
-    void calculateFPS();
-    void updateFPS(int);
-    void recordingStartStop();
-    void appendSavedVideo(QString name);
-    void updateMonitorStatus(int status);
+    void appendSavedPhoto(QString name);
 
 private:
     QMenu *fileMenu;
 
     QAction *cameraInfoAction;
     QAction *openCameraAction;
-    QAction *calcFPSAction;
     QAction *exitAction;
 
     QGraphicsScene *imageScene;
     QGraphicsView *imageView;
 
-#ifdef GAZER_USE_QT_CAMERA
-    QCamera *camera;
-    QCameraViewfinder *viewfinder;
-#endif
-
-    QCheckBox *monitorCheckBox;
-    QPushButton *recordButton;
+    QPushButton *shutterButton;
 
     QListView *saved_list;
     QStandardItemModel *list_model;

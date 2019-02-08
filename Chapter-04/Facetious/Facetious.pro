@@ -1,8 +1,8 @@
 TEMPLATE = app
-TARGET = Gazer
+TARGET = Facetious
 INCLUDEPATH += .
 
-QT += core gui multimedia network concurrent
+QT += core gui multimedia
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 unix: !mac {
@@ -24,7 +24,3 @@ win32 {
 # Input
 HEADERS += mainwindow.h capture_thread.h utilities.h
 SOURCES += main.cpp mainwindow.cpp capture_thread.cpp utilities.cpp
-
-# Using OpenCV or QCamera
-# DEFINES += GAZER_USE_QT_CAMERA=1
-# QT += multimediawidgets

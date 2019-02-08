@@ -37,39 +37,19 @@ void MainWindow::initUI()
     // main area
     QGridLayout *main_layout = new QGridLayout();
 
-#ifdef GAZER_USE_QT_CAMERA
-    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-    // I have two cemaras and use the second one here
-    camera = new QCamera(cameras[1]);
-    viewfinder = new QCameraViewfinder(this);
-    QCameraViewfinderSettings settings;
-    // the size must be compatible with the camera
-    settings.setResolution(QSize(800, 600));
-    camera->setViewfinder(viewfinder);
-    camera->setViewfinderSettings(settings);
-    main_layout->addWidget(viewfinder, 0, 0, 12, 1);
-#else
     imageScene = new QGraphicsScene(this);
     imageView = new QGraphicsView(imageScene);
     main_layout->addWidget(imageView, 0, 0, 12, 1);
-#endif
 
     // tools
     QGridLayout *tools_layout = new QGridLayout();
     main_layout->addLayout(tools_layout, 12, 0, 1, 1);
 
-    monitorCheckBox = new QCheckBox(this);
-    monitorCheckBox->setText("Monitor On/Off");
-    tools_layout->addWidget(monitorCheckBox, 0, 0);
-    connect(monitorCheckBox, SIGNAL(stateChanged(int)), this, SLOT(updateMonitorStatus(int)));
+    shutterButton = new QPushButton(this);
+    shutterButton->setText("Take a Photo");
+    tools_layout->addWidget(shutterButton, 0, 0, Qt::AlignHCenter);
 
-    recordButton = new QPushButton(this);
-    recordButton->setText("Record");
-    tools_layout->addWidget(recordButton, 0, 1, Qt::AlignHCenter);
-    tools_layout->addWidget(new QLabel(this), 0, 2);
-    connect(recordButton, SIGNAL(clicked(bool)), this, SLOT(recordingStartStop()));
-
-    // list of saved videos
+    // list of saved photos
     saved_list = new QListView(this);
     saved_list->setViewMode(QListView::IconMode);
     saved_list->setResizeMode(QListView::Adjust);
@@ -87,7 +67,7 @@ void MainWindow::initUI()
     mainStatusBar = statusBar();
     mainStatusLabel = new QLabel(mainStatusBar);
     mainStatusBar->addPermanentWidget(mainStatusLabel);
-    mainStatusLabel->setText("Gazer is Ready");
+    mainStatusLabel->setText("Facetious is Ready");
 
     createActions();
     populateSavedList();
@@ -100,8 +80,6 @@ void MainWindow::createActions()
     fileMenu->addAction(cameraInfoAction);
     openCameraAction = new QAction("&Open Camera", this);
     fileMenu->addAction(openCameraAction);
-    calcFPSAction = new QAction("&Calculate FPS", this);
-    fileMenu->addAction(calcFPSAction);
     exitAction = new QAction("E&xit", this);
     fileMenu->addAction(exitAction);
 
@@ -109,7 +87,6 @@ void MainWindow::createActions()
     connect(exitAction, SIGNAL(triggered(bool)), QApplication::instance(), SLOT(quit()));
     connect(cameraInfoAction, SIGNAL(triggered(bool)), this, SLOT(showCameraInfo()));
     connect(openCameraAction, SIGNAL(triggered(bool)), this, SLOT(openCamera()));
-    connect(calcFPSAction, SIGNAL(triggered(bool)), this, SLOT(calculateFPS()));
 }
 
 void MainWindow::showCameraInfo()
@@ -124,21 +101,12 @@ void MainWindow::showCameraInfo()
 }
 
 
-#ifdef GAZER_USE_QT_CAMERA
-void MainWindow::openCamera()
-{
-    camera->setCaptureMode(QCamera::CaptureVideo);
-    camera->start();
-}
-#else
 void MainWindow::openCamera()
 {
     if(capturer != nullptr) {
         // if a thread is already running, stop it
         capturer->setRunning(false);
         disconnect(capturer, &CaptureThread::frameCaptured, this, &MainWindow::updateFrame);
-        disconnect(capturer, &CaptureThread::fpsChanged, this, &MainWindow::updateFPS);
-        disconnect(capturer, &CaptureThread::videoSaved, this, &MainWindow::appendSavedVideo);
         connect(capturer, &CaptureThread::finished, capturer, &CaptureThread::deleteLater);
     }
     // I am using my second camera whose Index is 2.  Usually, the
@@ -146,22 +114,10 @@ void MainWindow::openCamera()
     int camID = 2;
     capturer = new CaptureThread(camID, data_lock);
     connect(capturer, &CaptureThread::frameCaptured, this, &MainWindow::updateFrame);
-    connect(capturer, &CaptureThread::fpsChanged, this, &MainWindow::updateFPS);
-    connect(capturer, &CaptureThread::videoSaved, this, &MainWindow::appendSavedVideo);
     capturer->start();
     mainStatusLabel->setText(QString("Capturing Camera %1").arg(camID));
-    monitorCheckBox->setCheckState(Qt::Unchecked);
-    recordButton->setText("Record");
-    recordButton->setEnabled(true);
 }
-#endif
 
-void MainWindow::calculateFPS()
-{
-    if(capturer != nullptr) {
-        capturer->startCalcFPS();
-    }
-}
 
 void MainWindow::updateFrame(cv::Mat *mat)
 {
@@ -183,66 +139,13 @@ void MainWindow::updateFrame(cv::Mat *mat)
     imageView->setSceneRect(image.rect());
 }
 
-void MainWindow::updateFPS(int fps)
-{
-    mainStatusLabel->setText(QString("FPS of current camera is %1").arg(fps));
-}
-
-
-void MainWindow::recordingStartStop() {
-    QString text = recordButton->text();
-    if(text == "Record" && capturer != nullptr) {
-        capturer->setVideoSavingStatus(CaptureThread::STARTING);
-        recordButton->setText("Stop Recording");
-        monitorCheckBox->setCheckState(Qt::Unchecked);
-        monitorCheckBox->setEnabled(false);
-    } else if(text == "Stop Recording" && capturer != nullptr) {
-        capturer->setVideoSavingStatus(CaptureThread::STOPPING);
-        recordButton->setText("Record");
-        monitorCheckBox->setEnabled(true);
-    }
-}
-
 
 void MainWindow::populateSavedList()
 {
-    QDir dir(Utilities::getDataPath());
-    QStringList nameFilters;
-    nameFilters << "*.jpg";
-    QFileInfoList files = dir.entryInfoList(
-        nameFilters, QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
-
-    foreach(QFileInfo cover, files) {
-        QString name = cover.baseName();
-        QStandardItem *item = new QStandardItem();
-        list_model->appendRow(item);
-        QModelIndex index = list_model->indexFromItem(item);
-        list_model->setData(index, QPixmap(cover.absoluteFilePath()).scaledToHeight(145), Qt::DecorationRole);
-        list_model->setData(index, name, Qt::DisplayRole);
-    }
+    // TODO
 }
 
-void MainWindow::appendSavedVideo(QString name)
+void MainWindow::appendSavedPhoto(QString name)
 {
-    QString cover = Utilities::getSavedVideoPath(name, "jpg");
-    QStandardItem *item = new QStandardItem();
-    list_model->appendRow(item);
-    QModelIndex index = list_model->indexFromItem(item);
-    list_model->setData(index, QPixmap(cover).scaledToHeight(145), Qt::DecorationRole);
-    list_model->setData(index, name, Qt::DisplayRole);
-    saved_list->scrollTo(index);
-}
-
-void MainWindow::updateMonitorStatus(int status)
-{
-    if(capturer == nullptr) {
-        return;
-    }
-    if(status) {
-        capturer->setMotionDetectingStatus(true);
-        recordButton->setEnabled(false);
-    } else {
-        capturer->setMotionDetectingStatus(false);
-        recordButton->setEnabled(true);
-    }
+    // TODO
 }
