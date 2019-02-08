@@ -36,6 +36,7 @@ private slots:
     void showCameraInfo();
     void openCamera();
     void updateFrame(cv::Mat*);
+    void takePhoto();
     void appendSavedPhoto(QString name);
 
 private:

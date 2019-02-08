@@ -48,6 +48,7 @@ void MainWindow::initUI()
     shutterButton = new QPushButton(this);
     shutterButton->setText("Take a Photo");
     tools_layout->addWidget(shutterButton, 0, 0, Qt::AlignHCenter);
+    connect(shutterButton, SIGNAL(clicked(bool)), this, SLOT(takePhoto()));
 
     // list of saved photos
     saved_list = new QListView(this);
@@ -107,6 +108,7 @@ void MainWindow::openCamera()
         // if a thread is already running, stop it
         capturer->setRunning(false);
         disconnect(capturer, &CaptureThread::frameCaptured, this, &MainWindow::updateFrame);
+        disconnect(capturer, &CaptureThread::photoTaken, this, &MainWindow::appendSavedPhoto);
         connect(capturer, &CaptureThread::finished, capturer, &CaptureThread::deleteLater);
     }
     // I am using my second camera whose Index is 2.  Usually, the
@@ -114,6 +116,7 @@ void MainWindow::openCamera()
     int camID = 2;
     capturer = new CaptureThread(camID, data_lock);
     connect(capturer, &CaptureThread::frameCaptured, this, &MainWindow::updateFrame);
+    connect(capturer, &CaptureThread::photoTaken, this, &MainWindow::appendSavedPhoto);
     capturer->start();
     mainStatusLabel->setText(QString("Capturing Camera %1").arg(camID));
 }
@@ -140,12 +143,39 @@ void MainWindow::updateFrame(cv::Mat *mat)
 }
 
 
+void MainWindow::takePhoto()
+{
+    if(capturer != nullptr) {
+        capturer->takePhoto();
+    }
+}
+
+
 void MainWindow::populateSavedList()
 {
-    // TODO
+    QDir dir(Utilities::getDataPath());
+    QStringList nameFilters;
+    nameFilters << "*.jpg";
+    QFileInfoList files = dir.entryInfoList(
+        nameFilters, QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
+
+    foreach(QFileInfo photo, files) {
+        QString name = photo.baseName();
+        QStandardItem *item = new QStandardItem();
+        list_model->appendRow(item);
+        QModelIndex index = list_model->indexFromItem(item);
+        list_model->setData(index, QPixmap(photo.absoluteFilePath()).scaledToHeight(145), Qt::DecorationRole);
+        list_model->setData(index, name, Qt::DisplayRole);
+    }
 }
 
 void MainWindow::appendSavedPhoto(QString name)
 {
-    // TODO
+    QString photo_path = Utilities::getPhotoPath(name, "jpg");
+    QStandardItem *item = new QStandardItem();
+    list_model->appendRow(item);
+    QModelIndex index = list_model->indexFromItem(item);
+    list_model->setData(index, QPixmap(photo_path).scaledToHeight(145), Qt::DecorationRole);
+    list_model->setData(index, name, Qt::DisplayRole);
+    saved_list->scrollTo(index);
 }
