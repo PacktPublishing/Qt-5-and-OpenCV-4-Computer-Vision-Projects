@@ -53,13 +53,13 @@ void CaptureThread::run() {
             break;
         }
         if(motion_detecting_status) {
-            motionDetect(frame);
+            motionDetect(tmp_frame);
         }
         if(video_saving_status == STARTING) {
-            startSavingVideo(frame);
+            startSavingVideo(tmp_frame);
         }
         if(video_saving_status == STARTED) {
-            video_writer->write(frame);
+            video_writer->write(tmp_frame);
         }
         if(video_saving_status == STOPPING) {
             stopSavingVideo();
