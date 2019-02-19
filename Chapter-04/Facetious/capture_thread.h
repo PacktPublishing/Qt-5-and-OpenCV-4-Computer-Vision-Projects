@@ -7,7 +7,7 @@
 #include <QMutex>
 
 #include "opencv2/opencv.hpp"
-#include "opencv2/videoio.hpp"
+#include "opencv2/objdetect.hpp"
 
 using namespace std;
 
@@ -30,6 +30,7 @@ signals:
 
 private:
     void takePhoto(cv::Mat &frame);
+    void detectFaces(cv::Mat &frame);
 
 private:
     bool running;
@@ -42,6 +43,9 @@ private:
 
     // take photos
     bool taking_photo;
+
+    // face detection
+    cv::CascadeClassifier *classifier;
 };
 
 #endif // CAPTURE_THREAD_H

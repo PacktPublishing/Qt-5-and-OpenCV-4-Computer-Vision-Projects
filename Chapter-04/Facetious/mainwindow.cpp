@@ -10,8 +10,6 @@
 #include <QStandardItem>
 #include <QSize>
 
-#include "opencv2/videoio.hpp"
-
 #include "mainwindow.h"
 #include "utilities.h"
 
