@@ -1,3 +1,4 @@
+#include <QApplication>
 #include <QTime>
 #include <QDebug>
 
@@ -31,7 +32,9 @@ void CaptureThread::run() {
     frame_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 
     classifier = new cv::CascadeClassifier(OPENCV_DATA_DIR "haarcascades/haarcascade_frontalface_default.xml");
-
+    mark_detector = cv::face::createFacemarkLBF();
+    QString model_data = QApplication::instance()->applicationDirPath() + "/data/lbfmodel.yaml";
+    mark_detector->loadModel(model_data.toStdString());
     while(running) {
         cap >> tmp_frame;
         if (tmp_frame.empty()) {
@@ -74,7 +77,21 @@ void CaptureThread::detectFaces(cv::Mat &frame)
     classifier->detectMultiScale(gray_frame, faces, 1.3, 5);
 
     cv::Scalar color = cv::Scalar(0, 0, 255); // red
+
+    // draw the circumscribe rectangles
     for(size_t i = 0; i < faces.size(); i++) {
         cv::rectangle(frame, faces[i], color, 1);
+    }
+
+    vector< vector<cv::Point2f> > shapes;
+    if (mark_detector->fit(frame, faces, shapes)) {
+        // draw facial land marks
+        for (unsigned long i=0; i<faces.size(); i++) {
+            for(unsigned long k=0; k<shapes[i].size(); k++) {
+                cv::circle(frame, shapes[i][k], 2, color, cv::FILLED);
+                // QString index = QString("%1").arg(k);
+                // cv::putText(frame, index.toStdString(), shapes[i][k], cv::FONT_HERSHEY_SIMPLEX, 0.4, color, 2);
+            }
+        }
     }
 }

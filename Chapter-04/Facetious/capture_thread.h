@@ -8,6 +8,7 @@
 
 #include "opencv2/opencv.hpp"
 #include "opencv2/objdetect.hpp"
+#include "opencv2/face/facemark.hpp"
 
 using namespace std;
 
@@ -46,6 +47,8 @@ private:
 
     // face detection
     cv::CascadeClassifier *classifier;
+    cv::Ptr<cv::face::Facemark> mark_detector;
+
 };
 
 #endif // CAPTURE_THREAD_H
