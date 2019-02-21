@@ -48,6 +48,21 @@ void MainWindow::initUI()
     tools_layout->addWidget(shutterButton, 0, 0, Qt::AlignHCenter);
     connect(shutterButton, SIGNAL(clicked(bool)), this, SLOT(takePhoto()));
 
+    // masks
+    QGridLayout *masks_layout = new QGridLayout();
+    main_layout->addLayout(masks_layout, 13, 0, 1, 1);
+    masks_layout->addWidget(new QLabel("Select Masks:", this));
+    for (int i = 0; i < CaptureThread::MASK_COUNT; i++){
+        mask_checkboxes[i] = new QCheckBox(this);
+        masks_layout->addWidget(mask_checkboxes[i], 0, i + 1);
+        connect(mask_checkboxes[i], SIGNAL(stateChanged(int)), this, SLOT(updateMasks(int)));
+    }
+    mask_checkboxes[0]->setText("Rectangle");
+    mask_checkboxes[1]->setText("Landmarks");
+    mask_checkboxes[2]->setText("Glasses");
+    mask_checkboxes[3]->setText("Mustache");
+    mask_checkboxes[4]->setText("Mouse Nose");
+
     // list of saved photos
     saved_list = new QListView(this);
     saved_list->setViewMode(QListView::IconMode);
@@ -56,7 +71,7 @@ void MainWindow::initUI()
     saved_list->setWrapping(false);
     list_model = new QStandardItemModel(this);
     saved_list->setModel(list_model);
-    main_layout->addWidget(saved_list, 13, 0, 4, 1);
+    main_layout->addWidget(saved_list, 14, 0, 4, 1);
 
     QWidget *widget = new QWidget();
     widget->setLayout(main_layout);
@@ -109,6 +124,11 @@ void MainWindow::openCamera()
         disconnect(capturer, &CaptureThread::photoTaken, this, &MainWindow::appendSavedPhoto);
         connect(capturer, &CaptureThread::finished, capturer, &CaptureThread::deleteLater);
     }
+
+    for (int i = 0; i < CaptureThread::MASK_COUNT; i++){
+        mask_checkboxes[i]->setCheckState(Qt::Unchecked);
+    }
+
     // I am using my second camera whose Index is 2.  Usually, the
     // Index of the first camera is 0.
     int camID = 2;
@@ -176,4 +196,19 @@ void MainWindow::appendSavedPhoto(QString name)
     list_model->setData(index, QPixmap(photo_path).scaledToHeight(145), Qt::DecorationRole);
     list_model->setData(index, name, Qt::DisplayRole);
     saved_list->scrollTo(index);
+}
+
+
+void MainWindow::updateMasks(int status)
+{
+    if(capturer == nullptr) {
+        return;
+    }
+
+    QCheckBox *box = qobject_cast<QCheckBox*>(sender());
+    for (int i = 0; i < CaptureThread::MASK_COUNT; i++){
+        if (mask_checkboxes[i] == box) {
+            capturer->updateMasksFlag(static_cast<CaptureThread::MASK_TYPE>(i), status != 0);
+        }
+    }
 }

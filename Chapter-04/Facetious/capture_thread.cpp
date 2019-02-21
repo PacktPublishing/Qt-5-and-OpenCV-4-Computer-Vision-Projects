@@ -13,6 +13,7 @@ CaptureThread::CaptureThread(int camera, QMutex *lock):
     taking_photo = false;
 
     loadOrnaments();
+    masks_flag = 0;
 }
 
 CaptureThread::CaptureThread(QString videoPath, QMutex *lock):
@@ -22,6 +23,7 @@ CaptureThread::CaptureThread(QString videoPath, QMutex *lock):
     taking_photo = false;
 
     loadOrnaments();
+    masks_flag = 0;
 }
 
 CaptureThread::~CaptureThread() {
@@ -46,7 +48,8 @@ void CaptureThread::run() {
             break;
         }
 
-        detectFaces(tmp_frame);
+        if(masks_flag > 0)
+            detectFaces(tmp_frame);
 
         if(taking_photo) {
             takePhoto(tmp_frame);
@@ -84,22 +87,29 @@ void CaptureThread::detectFaces(cv::Mat &frame)
     cv::Scalar color = cv::Scalar(0, 0, 255); // red
 
     // draw the circumscribe rectangles
-    for(size_t i = 0; i < faces.size(); i++) {
-        cv::rectangle(frame, faces[i], color, 1);
+    if (isMaskOn(RECTANGLE)) {
+        for(size_t i = 0; i < faces.size(); i++) {
+            cv::rectangle(frame, faces[i], color, 1);
+        }
     }
 
     vector< vector<cv::Point2f> > shapes;
     if (mark_detector->fit(frame, faces, shapes)) {
         // draw facial land marks
         for (unsigned long i=0; i<faces.size(); i++) {
-            for(unsigned long k=0; k<shapes[i].size(); k++) {
-                // cv::circle(frame, shapes[i][k], 2, color, cv::FILLED);
-                // QString index = QString("%1").arg(k);
-                // cv::putText(frame, index.toStdString(), shapes[i][k], cv::FONT_HERSHEY_SIMPLEX, 0.4, color, 2);
+            if (isMaskOn(LANDMARKS)) {
+                for(unsigned long k=0; k<shapes[i].size(); k++) {
+                    cv::circle(frame, shapes[i][k], 2, color, cv::FILLED);
+                    // QString index = QString("%1").arg(k);
+                    // cv::putText(frame, index.toStdString(), shapes[i][k], cv::FONT_HERSHEY_SIMPLEX, 0.4, color, 2);
+                }
             }
-            drawGlasses(frame, shapes[i]);
-            drawMustache(frame, shapes[i]);
-            drawMouseNose(frame, shapes[i]);
+            if (isMaskOn(GLASSES))
+                drawGlasses(frame, shapes[i]);
+            if (isMaskOn(MUSTACHE))
+                drawMustache(frame, shapes[i]);
+            if (isMaskOn(MOUSE_NOSE))
+                drawMouseNose(frame, shapes[i]);
         }
     }
 }
