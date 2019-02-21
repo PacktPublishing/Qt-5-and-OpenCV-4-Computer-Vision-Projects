@@ -32,6 +32,10 @@ signals:
 private:
     void takePhoto(cv::Mat &frame);
     void detectFaces(cv::Mat &frame);
+    void loadOrnaments();
+    void drawGlasses(cv::Mat &frame, vector<cv::Point2f> &marks);
+    void drawMustache(cv::Mat &frame, vector<cv::Point2f> &marks);
+    void drawMouseNose(cv::Mat &frame, vector<cv::Point2f> &marks);
 
 private:
     bool running;
@@ -49,6 +53,10 @@ private:
     cv::CascadeClassifier *classifier;
     cv::Ptr<cv::face::Facemark> mark_detector;
 
+    // mask ornaments
+    cv::Mat glasses;
+    cv::Mat mustache;
+    cv::Mat mouse_nose;
 };
 
 #endif // CAPTURE_THREAD_H

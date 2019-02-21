@@ -1,0 +1,8 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource>
+    <file>images/glasses.jpg</file>
+    <file>images/mustache.jpg</file>
+    <file>images/mouse-nose.jpg</file>
+  </qresource>
+</RCC>

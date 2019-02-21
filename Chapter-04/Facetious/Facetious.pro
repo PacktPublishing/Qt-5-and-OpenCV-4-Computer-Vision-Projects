@@ -27,3 +27,5 @@ SOURCES += main.cpp mainwindow.cpp capture_thread.cpp utilities.cpp
 
 # DEFINES += OPENCV_DATA_DIR=\\\"/usr/share/opencv/\\\"
 DEFINES += OPENCV_DATA_DIR=\\\"/home/kdr2/programs/opencv/share/opencv4/\\\"
+
+RESOURCES = images.qrc
