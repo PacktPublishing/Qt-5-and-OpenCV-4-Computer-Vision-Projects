@@ -22,3 +22,6 @@ Chapter-03/*/Makefile
 Chapter-04/Facetious/Facetious
 Chapter-04/*/Makefile
 Chapter-04/Facetious/data/lbfmodel.yaml
+# ch05
+Chapter-05/Literacy/Literacy
+Chapter-05/*/Makefile
