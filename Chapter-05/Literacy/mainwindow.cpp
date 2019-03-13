@@ -10,7 +10,9 @@
 
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), currentImage(nullptr)
+    QMainWindow(parent)
+    , currentImage(nullptr)
+    , tesseractAPI(nullptr)
 {
     initUI();
 }
@@ -66,12 +68,15 @@ void MainWindow::createActions()
 
     // add actions to toolbars
     fileToolBar->addAction(openAction);
+    ocrAction = new QAction("OCR", this);
+    fileToolBar->addAction(ocrAction);
 
     // connect the signals and slots
     connect(exitAction, SIGNAL(triggered(bool)), QApplication::instance(), SLOT(quit()));
     connect(openAction, SIGNAL(triggered(bool)), this, SLOT(openImage()));
     connect(saveImageAsAction, SIGNAL(triggered(bool)), this, SLOT(saveImageAs()));
     connect(saveTextAsAction, SIGNAL(triggered(bool)), this, SLOT(saveTextAs()));
+    connect(ocrAction, SIGNAL(triggered(bool)), this, SLOT(extractText()));
 
     setupShortcuts();
 }
@@ -160,4 +165,37 @@ void MainWindow::setupShortcuts()
     shortcuts.clear();
     shortcuts << (Qt::CTRL + Qt::Key_Q);
     exitAction->setShortcuts(shortcuts);
+}
+
+void MainWindow::extractText()
+{
+    if (currentImage == nullptr) {
+        QMessageBox::information(this, "Information", "No opened image.");
+        return;
+    }
+
+    char *old_ctype = strdup(setlocale(LC_ALL, NULL));
+    setlocale(LC_ALL, "C");
+    tesseractAPI = new tesseract::TessBaseAPI();
+    // Initialize tesseract-ocr with English, with specifying tessdata path
+    if (tesseractAPI->Init(TESSDATA_PREFIX, "eng")) {
+        QMessageBox::information(this, "Error", "Could not initialize tesseract.");
+        return;
+    }
+
+    QPixmap pixmap = currentImage->pixmap();
+    QImage image = pixmap.toImage();
+    image = image.convertToFormat(QImage::Format_RGB888);
+
+    tesseractAPI->SetImage(image.bits(), image.width(), image.height(),
+        3, image.bytesPerLine());
+    char *outText = tesseractAPI->GetUTF8Text();
+    editor->setPlainText(outText);
+    // Destroy used object and release memory
+    tesseractAPI->End();
+    delete tesseractAPI;
+    tesseractAPI = nullptr;
+    delete [] outText;
+    setlocale(LC_ALL, old_ctype);
+    free(old_ctype);
 }

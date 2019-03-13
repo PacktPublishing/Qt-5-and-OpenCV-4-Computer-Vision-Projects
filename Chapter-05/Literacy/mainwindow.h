@@ -12,6 +12,8 @@
 #include <QGraphicsPixmapItem>
 #include <QTextEdit>
 
+#include "tesseract/baseapi.h"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -30,6 +32,7 @@ private slots:
     void openImage();
     void saveImageAs();
     void saveTextAs();
+    void extractText();
 
 private:
     QMenu *fileMenu;
@@ -48,9 +51,12 @@ private:
     QAction *saveImageAsAction;
     QAction *saveTextAsAction;
     QAction *exitAction;
+    QAction *ocrAction;
 
     QString currentImagePath;
     QGraphicsPixmapItem *currentImage;
+
+    tesseract::TessBaseAPI *tesseractAPI;
 };
 
 #endif // MAINWINDOW_H
