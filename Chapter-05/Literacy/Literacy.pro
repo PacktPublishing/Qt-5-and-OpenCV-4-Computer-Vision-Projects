@@ -17,6 +17,23 @@ win32 {
     LIBS += -lc:/path/to/opencv/lib/tesseract
 }
 
+# opencv config
+unix: !mac {
+    INCLUDEPATH += /home/kdr2/programs/opencv/include/opencv4
+    LIBS += -L/home/kdr2/programs/opencv/lib -lopencv_core -lopencv_imgproc -lopencv_dnn
+}
+
+unix: mac {
+    INCLUDEPATH += /path/to/opencv/include/opencv4
+    LIBS += -L/path/to/opencv/lib -lopencv_world
+}
+
+win32 {
+    INCLUDEPATH += c:/path/to/opencv/include/opencv4
+    LIBS += -lc:/path/to/opencv/lib/opencv_world
+}
+
+
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += TESSDATA_PREFIX=\\\"/home/kdr2/programs/tesseract/share/tessdata/\\\"
 

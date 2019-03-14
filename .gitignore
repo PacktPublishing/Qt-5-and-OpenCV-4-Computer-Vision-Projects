@@ -25,3 +25,4 @@ Chapter-04/Facetious/data/lbfmodel.yaml
 # ch05
 Chapter-05/Literacy/Literacy
 Chapter-05/*/Makefile
+frozen_east_text_detection.pb
