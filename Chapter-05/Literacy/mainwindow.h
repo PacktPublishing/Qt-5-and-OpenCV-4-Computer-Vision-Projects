@@ -10,8 +10,10 @@
 #include <QGraphicsView>
 #include <QStatusBar>
 #include <QGraphicsPixmapItem>
+#include <QPixmap>
 #include <QTextEdit>
 #include <QCheckBox>
+#include <QTimer>
 
 #include "tesseract/baseapi.h"
 
@@ -25,6 +27,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent=nullptr);
     ~MainWindow();
+    void showImage(QPixmap);
 
 private:
     void initUI();
@@ -42,6 +45,8 @@ private slots:
     void saveImageAs();
     void saveTextAs();
     void extractText();
+    void captureScreen();
+    void startCapture();
 
 private:
     QMenu *fileMenu;
@@ -60,6 +65,7 @@ private:
     QAction *saveImageAsAction;
     QAction *saveTextAsAction;
     QAction *exitAction;
+    QAction *captureAction;
     QAction *ocrAction;
     QCheckBox *detectAreaCheckBox;
 

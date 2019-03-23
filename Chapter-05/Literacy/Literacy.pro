@@ -38,5 +38,5 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += TESSDATA_PREFIX=\\\"/home/kdr2/programs/tesseract/share/tessdata/\\\"
 
 # Input
-HEADERS += mainwindow.h
-SOURCES += main.cpp mainwindow.cpp
+HEADERS += mainwindow.h screencapturer.h
+SOURCES += main.cpp mainwindow.cpp screencapturer.cpp
