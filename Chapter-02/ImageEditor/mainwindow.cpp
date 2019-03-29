@@ -230,6 +230,7 @@ void MainWindow::blurImage()
         mat.data,
         mat.cols,
         mat.rows,
+        mat.step,
         QImage::Format_RGB888);
     pixmap = QPixmap::fromImage(image_blurred);
     imageScene->clear();
@@ -297,6 +298,7 @@ void MainWindow::pluginPerform()
         mat.data,
         mat.cols,
         mat.rows,
+        mat.step,
         QImage::Format_RGB888);
     pixmap = QPixmap::fromImage(image_edited);
     imageScene->clear();

@@ -150,6 +150,7 @@ void MainWindow::updateFrame(cv::Mat *mat)
         currentFrame.data,
         currentFrame.cols,
         currentFrame.rows,
+        currentFrame.step,
         QImage::Format_RGB888);
     QPixmap image = QPixmap::fromImage(frame);
 
