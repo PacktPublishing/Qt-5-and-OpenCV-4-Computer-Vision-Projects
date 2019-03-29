@@ -30,6 +30,8 @@ void CaptureThread::run() {
     frame_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
     frame_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 
+    classifier = new cv::CascadeClassifier(OPENCV_DATA_DIR "haarcascades/haarcascade_frontalcatface_extended.xml");
+
     while(running) {
         cap >> tmp_frame;
         if (tmp_frame.empty()) {
@@ -40,6 +42,8 @@ void CaptureThread::run() {
             takePhoto(tmp_frame);
         }
 
+        detectObjects(tmp_frame);
+
         cvtColor(tmp_frame, tmp_frame, cv::COLOR_BGR2RGB);
         data_lock->lock();
         frame = tmp_frame;
@@ -47,6 +51,8 @@ void CaptureThread::run() {
         emit frameCaptured(&frame);
     }
     cap.release();
+    delete classifier;
+    classifier = nullptr;
     running = false;
 }
 
@@ -58,4 +64,17 @@ void CaptureThread::takePhoto(cv::Mat &frame)
     cv::imwrite(photo_path.toStdString(), frame);
     emit photoTaken(photo_name);
     taking_photo = false;
+}
+
+void CaptureThread::detectObjects(cv::Mat &frame)
+{
+    vector<cv::Rect> objects;
+    classifier->detectMultiScale(frame, objects, 1.3, 5);
+
+    cv::Scalar color = cv::Scalar(0, 0, 255); // red
+
+    // draw the circumscribe rectangles
+    for(size_t i = 0; i < objects.size(); i++) {
+        cv::rectangle(frame, objects[i], color, 2);
+    }
 }

@@ -30,6 +30,7 @@ signals:
 
 private:
     void takePhoto(cv::Mat &frame);
+    void detectObjects(cv::Mat &frame);
 
 private:
     bool running;
@@ -42,6 +43,9 @@ private:
 
     // take photos
     bool taking_photo;
+
+    // object detection
+    cv::CascadeClassifier *classifier;
 };
 
 #endif // CAPTURE_THREAD_H
