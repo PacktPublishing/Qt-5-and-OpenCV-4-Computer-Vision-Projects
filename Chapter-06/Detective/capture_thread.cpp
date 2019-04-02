@@ -31,13 +31,15 @@ void CaptureThread::run() {
     frame_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 
     classifier = new cv::CascadeClassifier(OPENCV_DATA_DIR "haarcascades/haarcascade_frontalcatface_extended.xml");
-
+    // classifier = new cv::CascadeClassifier("../boston-bull/cascade.xml");
+    // classifier = new cv::CascadeClassifier("../no-entry/cascade.xml");
     while(running) {
         cap >> tmp_frame;
         if (tmp_frame.empty()) {
             break;
         }
-
+        // tmp_frame = cv::imread("../boston-bull/boston-bull-predict.png");
+        // tmp_frame = cv::imread("../no-entry/no-entry-predict.png");
         if(taking_photo) {
             takePhoto(tmp_frame);
         }
@@ -69,7 +71,8 @@ void CaptureThread::takePhoto(cv::Mat &frame)
 void CaptureThread::detectObjects(cv::Mat &frame)
 {
     vector<cv::Rect> objects;
-    classifier->detectMultiScale(frame, objects, 1.3, 5);
+    int minNeighbors = 5; // 3 for no-entry-sign; 5-for others.
+    classifier->detectMultiScale(frame, objects, 1.3, minNeighbors);
 
     cv::Scalar color = cv::Scalar(0, 0, 255); // red
 
