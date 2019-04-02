@@ -1,0 +1,10 @@
+*.tar
+*.bak
+*.zip
+*.vec
+*.log
+log*
+Images/
+classifier/
+negative/
+positive/

@@ -1,0 +1,4 @@
+background/traffic-sign-bg-0.png
+background/traffic-sign-bg-1.png
+background/traffic-sign-bg-2.png
+background/traffic-sign-bg-3.png
