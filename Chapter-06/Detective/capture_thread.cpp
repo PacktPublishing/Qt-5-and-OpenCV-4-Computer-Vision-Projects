@@ -44,8 +44,17 @@ void CaptureThread::run() {
             takePhoto(tmp_frame);
         }
 
+#ifdef TIME_MEASURE
+        int64 t0 = cv::getTickCount();
+#endif
         // detectObjects(tmp_frame);
         detectObjectsDNN(tmp_frame);
+
+#ifdef TIME_MEASURE
+        int64 t1 = cv::getTickCount();
+        double t = (t1-t0) * 1000 /cv::getTickFrequency();
+        qDebug() << "Decteing time on a single frame: " << t <<"ms";
+#endif
 
         cvtColor(tmp_frame, tmp_frame, cv::COLOR_BGR2RGB);
         data_lock->lock();
@@ -119,6 +128,13 @@ void CaptureThread::detectObjectsDNN(cv::Mat &frame)
     // forward
     vector<cv::Mat> outs;
     net.forward(outs, getOutputsNames(net));
+
+#ifdef TIME_MEASURE
+    vector<double> layersTimes;
+    double freq = cv::getTickFrequency() / 1000;
+    double t = net.getPerfProfile(layersTimes) / freq;
+    qDebug() << "YOLO: Inference time on a single frame: " << t <<"ms";
+#endif
 
     // remove the bounding boxes with low confidence
     vector<int> outClassIds;

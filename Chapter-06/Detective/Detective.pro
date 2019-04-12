@@ -21,6 +21,7 @@ win32 {
 }
 
 DEFINES += OPENCV_DATA_DIR=\\\"/home/kdr2/programs/opencv/share/opencv4/\\\"
+DEFINES += TIME_MEASURE=1
 
 # Input
 HEADERS += mainwindow.h capture_thread.h utilities.h
