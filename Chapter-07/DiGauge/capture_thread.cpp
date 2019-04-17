@@ -30,16 +30,11 @@ void CaptureThread::run() {
     frame_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
     frame_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 
-    classifier = new cv::CascadeClassifier(OPENCV_DATA_DIR "haarcascades/haarcascade_frontalcatface_extended.xml");
-    // classifier = new cv::CascadeClassifier("../boston-bull/cascade.xml");
-    // classifier = new cv::CascadeClassifier("../no-entry/cascade.xml");
     while(running) {
         cap >> tmp_frame;
         if (tmp_frame.empty()) {
             break;
         }
-        // tmp_frame = cv::imread("../boston-bull/boston-bull-predict.png");
-        // tmp_frame = cv::imread("../no-entry/no-entry-predict.png");
         if(taking_photo) {
             takePhoto(tmp_frame);
         }
@@ -47,7 +42,6 @@ void CaptureThread::run() {
 #ifdef TIME_MEASURE
         int64 t0 = cv::getTickCount();
 #endif
-        // detectObjects(tmp_frame);
         detectObjectsDNN(tmp_frame);
 
 #ifdef TIME_MEASURE
@@ -63,8 +57,6 @@ void CaptureThread::run() {
         emit frameCaptured(&frame);
     }
     cap.release();
-    delete classifier;
-    classifier = nullptr;
     running = false;
 }
 
@@ -78,21 +70,6 @@ void CaptureThread::takePhoto(cv::Mat &frame)
     taking_photo = false;
 }
 
-void CaptureThread::detectObjects(cv::Mat &frame)
-{
-    vector<cv::Rect> objects;
-    int minNeighbors = 5; // 3 for no-entry-sign; 5-for others.
-    classifier->detectMultiScale(frame, objects, 1.3, minNeighbors);
-
-    cv::Scalar color = cv::Scalar(0, 0, 255); // red
-
-    // draw the circumscribe rectangles
-    for(size_t i = 0; i < objects.size(); i++) {
-        cv::rectangle(frame, objects[i], color, 2);
-    }
-}
-
-static vector<string> getOutputsNames(const cv::dnn::Net& net);
 static void decodeOutLayers(
     cv::Mat &frame, const vector<cv::Mat> &outs,
     vector<int> &outClassIds,
@@ -127,7 +104,7 @@ void CaptureThread::detectObjectsDNN(cv::Mat &frame)
 
     // forward
     vector<cv::Mat> outs;
-    net.forward(outs, getOutputsNames(net));
+    net.forward(outs, net.getUnconnectedOutLayersNames());
 
 #ifdef TIME_MEASURE
     vector<double> layersTimes;
@@ -156,18 +133,6 @@ void CaptureThread::detectObjectsDNN(cv::Mat &frame)
         top = max(top, labelSize.height);
         cv::putText(frame, label, cv::Point(left, top), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255,255,255));
     }
-}
-
-vector<string> getOutputsNames(const cv::dnn::Net& net)
-{
-    static vector<string> names;
-    vector<int> outLayers = net.getUnconnectedOutLayers();
-    vector<string> layersNames = net.getLayerNames();
-    names.resize(outLayers.size());
-    for (size_t i = 0; i < outLayers.size(); ++i)
-        names[i] = layersNames[outLayers[i] - 1];
-
-    return names;
 }
 
 void decodeOutLayers(

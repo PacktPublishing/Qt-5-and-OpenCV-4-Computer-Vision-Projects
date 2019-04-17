@@ -31,7 +31,6 @@ signals:
 
 private:
     void takePhoto(cv::Mat &frame);
-    void detectObjects(cv::Mat &frame);
     void detectObjectsDNN(cv::Mat &frame);
 
 private:
@@ -45,9 +44,6 @@ private:
 
     // take photos
     bool taking_photo;
-
-    // object detection
-    cv::CascadeClassifier *classifier;
 
     cv::dnn::Net net;
     vector<string> objectClasses;
