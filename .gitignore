@@ -30,3 +30,7 @@ frozen_east_text_detection.pb
 Chapter-06/Detective/Detective
 Chapter-06/Detective/data/
 Chapter-06/*/Makefile
+# ch07
+Chapter-07/DiGauge/DiGauge
+Chapter-07/DiGauge/data/
+Chapter-07/*/Makefile
