@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = Detective
+TARGET = DiGauge
 INCLUDEPATH += .
 
 QT += core gui multimedia

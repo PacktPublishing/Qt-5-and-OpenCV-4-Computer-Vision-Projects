@@ -68,7 +68,7 @@ void MainWindow::initUI()
     mainStatusBar = statusBar();
     mainStatusLabel = new QLabel(mainStatusBar);
     mainStatusBar->addPermanentWidget(mainStatusLabel);
-    mainStatusLabel->setText("Detective is Ready");
+    mainStatusLabel->setText("DiGauge is Ready");
 
     createActions();
     populateSavedList();

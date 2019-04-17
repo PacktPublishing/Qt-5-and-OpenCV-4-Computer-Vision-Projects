@@ -11,8 +11,8 @@ QString Utilities::getDataPath()
 {
     QString user_pictures_path = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation)[0];
     QDir pictures_dir(user_pictures_path);
-    pictures_dir.mkpath("Detective");
-    return pictures_dir.absoluteFilePath("Detective");
+    pictures_dir.mkpath("DiGauge");
+    return pictures_dir.absoluteFilePath("DiGauge");
 }
 
 QString Utilities::newPhotoName()
