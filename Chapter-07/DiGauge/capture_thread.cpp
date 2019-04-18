@@ -72,8 +72,6 @@ void CaptureThread::takePhoto(cv::Mat &frame)
 
 static void decodeOutLayers(
     cv::Mat &frame, const vector<cv::Mat> &outs,
-    vector<int> &outClassIds,
-    vector<float> &outConfidences,
     vector<cv::Rect> &outBoxes
 );
 
@@ -114,38 +112,22 @@ void CaptureThread::detectObjectsDNN(cv::Mat &frame)
 #endif
 
     // remove the bounding boxes with low confidence
-    vector<int> outClassIds;
-    vector<float> outConfidences;
     vector<cv::Rect> outBoxes;
-    decodeOutLayers(frame, outs, outClassIds, outConfidences, outBoxes);
+    decodeOutLayers(frame, outs, outBoxes);
 
-    for(size_t i = 0; i < outClassIds.size(); i ++) {
+    for(size_t i = 0; i < outBoxes.size(); i ++) {
         cv::rectangle(frame, outBoxes[i], cv::Scalar(0, 0, 255));
-
-        // get the label for the class name and its confidence
-        string label = objectClasses[outClassIds[i]];
-        label += cv::format(":%.2f", outConfidences[i]);
-
-        // display the label at the top of the bounding box
-        int baseLine;
-        cv::Size labelSize = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-        int left = outBoxes[i].x, top = outBoxes[i].y;
-        top = max(top, labelSize.height);
-        cv::putText(frame, label, cv::Point(left, top), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255,255,255));
     }
 }
 
 void decodeOutLayers(
     cv::Mat &frame, const vector<cv::Mat> &outs,
-    vector<int> &outClassIds,
-    vector<float> &outConfidences,
     vector<cv::Rect> &outBoxes
 )
 {
-    float confThreshold = 0.5; // confidence threshold
+    float confThreshold = 0.65; // confidence threshold
     float nmsThreshold = 0.4;  // non-maximum suppression threshold
 
-    vector<int> classIds;
     vector<float> confidences;
     vector<cv::Rect> boxes;
 
@@ -158,6 +140,8 @@ void decodeOutLayers(
             double confidence;
             // get the value and location of the maximum score
             cv::minMaxLoc(scores, 0, &confidence, 0, &classIdPoint);
+            if (classIdPoint.x != 2) // not a car!
+                continue;
             if (confidence > confThreshold)
             {
                 int centerX = (int)(data[0] * frame.cols);
@@ -167,7 +151,6 @@ void decodeOutLayers(
                 int left = centerX - width / 2;
                 int top = centerY - height / 2;
 
-                classIds.push_back(classIdPoint.x);
                 confidences.push_back((float)confidence);
                 boxes.push_back(cv::Rect(left, top, width, height));
             }
@@ -179,8 +162,6 @@ void decodeOutLayers(
     cv::dnn::NMSBoxes(boxes, confidences, confThreshold, nmsThreshold, indices);
     for (size_t i = 0; i < indices.size(); ++i) {
         int idx = indices[i];
-        outClassIds.push_back(classIds[idx]);
         outBoxes.push_back(boxes[idx]);
-        outConfidences.push_back(confidences[idx]);
     }
 }
