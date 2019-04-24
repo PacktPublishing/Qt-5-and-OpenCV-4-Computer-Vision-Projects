@@ -33,6 +33,7 @@ void MainWindow::initUI()
     this->resize(1000, 800);
     // setup menubar
     fileMenu = menuBar()->addMenu("&File");
+    viewMenu = menuBar()->addMenu("&View");
 
     // main area
     QGridLayout *main_layout = new QGridLayout();
@@ -84,10 +85,22 @@ void MainWindow::createActions()
     exitAction = new QAction("E&xit", this);
     fileMenu->addAction(exitAction);
 
+    birdEyeAction = new QAction("Bird Eye View");
+    birdEyeAction->setCheckable(true);
+    viewMenu->addAction(birdEyeAction);
+    eyeLevelAction = new QAction("Eye Level View");
+    eyeLevelAction->setCheckable(true);
+    viewMenu->addAction(eyeLevelAction);
+
+    birdEyeAction->setChecked(true);
+
     // connect the signals and slots
     connect(exitAction, SIGNAL(triggered(bool)), QApplication::instance(), SLOT(quit()));
     connect(cameraInfoAction, SIGNAL(triggered(bool)), this, SLOT(showCameraInfo()));
     connect(openCameraAction, SIGNAL(triggered(bool)), this, SLOT(openCamera()));
+
+    connect(birdEyeAction, SIGNAL(triggered(bool)), this, SLOT(changeViewMode()));
+    connect(eyeLevelAction, SIGNAL(triggered(bool)), this, SLOT(changeViewMode()));
 }
 
 void MainWindow::showCameraInfo()
@@ -119,6 +132,9 @@ void MainWindow::openCamera()
     connect(capturer, &CaptureThread::photoTaken, this, &MainWindow::appendSavedPhoto);
     capturer->start();
     mainStatusLabel->setText(QString("Capturing Camera %1").arg(camID));
+
+    birdEyeAction->setChecked(true);
+    eyeLevelAction->setChecked(false);
 }
 
 
@@ -179,4 +195,22 @@ void MainWindow::appendSavedPhoto(QString name)
     list_model->setData(index, QPixmap(photo_path).scaledToHeight(145), Qt::DecorationRole);
     list_model->setData(index, name, Qt::DisplayRole);
     saved_list->scrollTo(index);
+}
+
+void MainWindow::changeViewMode()
+{
+    CaptureThread::ViewMode mode = CaptureThread::BIRDEYE;
+    QAction *active_action = qobject_cast<QAction*>(sender());
+    if(active_action == birdEyeAction) {
+        birdEyeAction->setChecked(true);
+        eyeLevelAction->setChecked(false);
+        mode = CaptureThread::BIRDEYE;
+    } else if (active_action == eyeLevelAction) {
+        eyeLevelAction->setChecked(true);
+        birdEyeAction->setChecked(false);
+        mode = CaptureThread::EYELEVEL;
+    }
+    if(capturer != nullptr) {
+        capturer->setViewMode(mode);
+    }
 }

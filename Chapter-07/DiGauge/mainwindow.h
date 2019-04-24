@@ -38,6 +38,7 @@ private slots:
     void updateFrame(cv::Mat*);
     void takePhoto();
     void appendSavedPhoto(QString name);
+    void changeViewMode();
 
 private:
     QMenu *fileMenu;
@@ -45,6 +46,11 @@ private:
     QAction *cameraInfoAction;
     QAction *openCameraAction;
     QAction *exitAction;
+
+    QMenu *viewMenu;
+
+    QAction *birdEyeAction;
+    QAction *eyeLevelAction;
 
     QGraphicsScene *imageScene;
     QGraphicsView *imageView;

@@ -12,6 +12,7 @@ CaptureThread::CaptureThread(int camera, QMutex *lock):
 {
     frame_width = frame_height = 0;
     taking_photo = false;
+    viewMode = BIRDEYE;
 }
 
 CaptureThread::CaptureThread(QString videoPath, QMutex *lock):
@@ -19,6 +20,7 @@ CaptureThread::CaptureThread(QString videoPath, QMutex *lock):
 {
     frame_width = frame_height = 0;
     taking_photo = false;
+    viewMode = BIRDEYE;
 }
 
 CaptureThread::~CaptureThread() {
@@ -123,8 +125,11 @@ void CaptureThread::detectObjectsDNN(cv::Mat &frame)
     for(size_t i = 0; i < outBoxes.size(); i ++) {
         cv::rectangle(frame, outBoxes[i], cv::Scalar(0, 0, 255));
     }
-    // distanceBirdEye(frame, outBoxes);
-    distanceEyeLevel(frame, outBoxes);
+    if (viewMode == BIRDEYE) {
+        distanceBirdEye(frame, outBoxes);
+    } else {
+        distanceEyeLevel(frame, outBoxes);
+    }
 }
 
 void decodeOutLayers(
@@ -249,7 +254,8 @@ void distanceEyeLevel(cv::Mat &frame, vector<cv::Rect> &cars)
     // display the label at the top-left corner of the bounding box
     string label = cv::format("%.2f m", distance / 100);
     int baseLine;
-    cv::Size labelSize = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+    cv::Size labelSize = cv::getTextSize(
+        label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
     cv::putText(frame, label, cv::Point(car.x, car.y + labelSize.height),
         cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 255));
 }
