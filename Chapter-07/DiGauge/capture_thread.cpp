@@ -78,6 +78,7 @@ static void decodeOutLayers(
     vector<cv::Rect> &outBoxes
 );
 void distanceBirdEye(cv::Mat &frame, vector<cv::Rect> &cars);
+void distanceEyeLevel(cv::Mat &frame, vector<cv::Rect> &cars);
 
 void CaptureThread::detectObjectsDNN(cv::Mat &frame)
 {
@@ -122,7 +123,8 @@ void CaptureThread::detectObjectsDNN(cv::Mat &frame)
     for(size_t i = 0; i < outBoxes.size(); i ++) {
         cv::rectangle(frame, outBoxes[i], cv::Scalar(0, 0, 255));
     }
-    distanceBirdEye(frame, outBoxes);
+    // distanceBirdEye(frame, outBoxes);
+    distanceEyeLevel(frame, outBoxes);
 }
 
 void decodeOutLayers(
@@ -217,4 +219,37 @@ void distanceBirdEye(cv::Mat &frame, vector<cv::Rect> &cars)
         int label_x = (x1 + x2) / 2 - (labelSize.width / 2);
         cv::putText(frame, label, cv::Point(label_x, 20), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255));
     }
+}
+
+void distanceEyeLevel(cv::Mat &frame, vector<cv::Rect> &cars)
+{
+    const float d0 = 1000.0f; // cm
+    const float w0 = 150.0f; // px
+
+    // find the target car: the most middle and biggest one
+    vector<cv::Rect> cars_in_middle;
+    vector<int> cars_area;
+    size_t target_idx = 0;
+
+    for (auto car: cars) {
+        if(car.x < frame.cols / 2 && (car.x + car.width) > frame.cols / 2) {
+            cars_in_middle.push_back(car);
+            int area = car.width * car.height;
+            cars_area.push_back(area);
+            if (area > cars_area[target_idx]) {
+                target_idx = cars_area.size() - 1;
+            }
+        }
+    }
+
+    if(cars_in_middle.size() <= target_idx) return;
+
+    cv::Rect car = cars_in_middle[target_idx];
+    float distance =  (w0 / car.width) * d0; // (w0 / w1) * d0
+    // display the label at the top-left corner of the bounding box
+    string label = cv::format("%.2f m", distance / 100);
+    int baseLine;
+    cv::Size labelSize = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+    cv::putText(frame, label, cv::Point(car.x, car.y + labelSize.height),
+        cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 255));
 }
