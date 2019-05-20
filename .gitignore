@@ -5,6 +5,7 @@
 *.so.1.0
 *.so.1.0.0
 *.mp4
+*.exe
 moc_*
 qrc_*
 .qmake.stash
@@ -34,3 +35,4 @@ Chapter-06/*/Makefile
 Chapter-07/DiGauge/DiGauge
 Chapter-07/DiGauge/data/
 Chapter-07/*/Makefile
+# ch08
