@@ -36,3 +36,5 @@ Chapter-07/DiGauge/DiGauge
 Chapter-07/DiGauge/data/
 Chapter-07/*/Makefile
 # ch08
+Chapter-08/*/Makefile
+Chapter-08/QtGL/QtGL
