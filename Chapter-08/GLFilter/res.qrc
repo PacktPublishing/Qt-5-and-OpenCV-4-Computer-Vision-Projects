@@ -1,0 +1,8 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource>
+    <file>shaders/vertex.shader</file>
+    <file>shaders/fragment.shader</file>
+    <file>images/lizard.jpg</file>
+  </qresource>
+</RCC>
