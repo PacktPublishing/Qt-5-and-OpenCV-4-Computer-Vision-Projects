@@ -13,6 +13,12 @@
 #include <QString>
 #include <QImage>
 
+#define USE_OPENCV
+
+#ifdef USE_OPENCV
+#include "opencv2/opencv.hpp"
+#endif
+
 class GLPanel : public QOpenGLWidget, protected QOpenGLFunctions_4_2_Core
 {
     Q_OBJECT
@@ -35,7 +41,11 @@ private:
     GLuint texture;
     GLuint shaderProg;
 
+#ifdef USE_OPENCV
+    cv::Mat img;
+#else
     QImage img;
+#endif
 };
 
 #endif
