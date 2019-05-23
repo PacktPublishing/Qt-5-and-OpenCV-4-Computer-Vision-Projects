@@ -59,6 +59,10 @@ void GLPanel::initializeGL()
     // 2. generate texture
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
     glTexImage2D(
         GL_TEXTURE_2D, 0, GL_RGB,
         img.width(), img.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, img.bits());
@@ -85,6 +89,11 @@ void GLPanel::initializeGL()
     glAttachShader(shaderProg, frag_shader);
     glAttachShader(shaderProg, vert_shader);
     glLinkProgram(shaderProg);
+
+    // scale ration
+    glUseProgram(shaderProg);
+    int pixel_scale_loc = glGetUniformLocation(shaderProg, "pixelScale");
+    glUniform2f(pixel_scale_loc, 1.0f / img.width(), 1.0f / img.height());
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glClearColor(0.1, 0.1, 0.2, 1.0);
