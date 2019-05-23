@@ -10,6 +10,9 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 
+#include <QString>
+#include <QImage>
+
 class GLPanel : public QOpenGLWidget, protected QOpenGLFunctions_4_2_Core
 {
     Q_OBJECT
@@ -22,11 +25,17 @@ protected:
     void initializeGL() override;
     void paintGL() override;
     void resizeGL(int w, int h) override;
+
+private:
+    void saveOutputImage(QString path);
+
 private:
     GLuint vbo;
     GLuint vao;
     GLuint texture;
     GLuint shaderProg;
+
+    QImage img;
 };
 
 #endif

@@ -54,7 +54,7 @@ void GLPanel::initializeGL()
     // texture
     glEnable(GL_TEXTURE_2D);
     // 1. read the image data
-    QImage img(":/images/lizard.jpg");
+    img = QImage(":/images/lizard.jpg");
     img = img.convertToFormat(QImage::Format_RGB888).mirrored(false, true);
     // 2. generate texture
     glGenTextures(1, &texture);
@@ -110,9 +110,19 @@ void GLPanel::paintGL()
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glFlush();
+    saveOutputImage("./output.jpg");
 }
 
 void GLPanel::resizeGL(int w, int h)
 {
     glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+}
+
+void GLPanel::saveOutputImage(QString path)
+{
+    QImage output(img.width(), img.height(), QImage::Format_RGB888);
+    glReadPixels(
+        0, 0, img.width(), img.height(), GL_RGB, GL_UNSIGNED_BYTE, output.bits());
+    output = output.mirrored(false, true);
+    output.save(path);
 }
