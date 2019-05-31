@@ -42,7 +42,7 @@ private slots:
     void openCamera();
     void updateFrame(cv::Mat*);
     void calculateFPS();
-    void updateFPS(int);
+    void updateFPS(float);
     void recordingStartStop();
     void appendSavedVideo(QString name);
     void updateMonitorStatus(int status);

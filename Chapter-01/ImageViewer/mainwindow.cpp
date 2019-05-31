@@ -156,7 +156,7 @@ void MainWindow::nextImage()
 void MainWindow::saveAs()
 {
     if (currentImage == nullptr) {
-        QMessageBox::information(this, "Information", "Noting to save.");
+        QMessageBox::information(this, "Information", "Nothing to save.");
         return;
     }
     QFileDialog dialog(this);

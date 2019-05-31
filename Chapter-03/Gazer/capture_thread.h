@@ -16,8 +16,8 @@ class CaptureThread : public QThread
 {
     Q_OBJECT
 public:
-    explicit CaptureThread(int camera, QMutex *lock);
-    explicit CaptureThread(QString videoPath, QMutex *lock);
+    CaptureThread(int camera, QMutex *lock);
+    CaptureThread(QString videoPath, QMutex *lock);
     ~CaptureThread();
     void setRunning(bool run) {running = run; };
     void startCalcFPS() {fps_calculating = true; };
@@ -40,7 +40,7 @@ protected:
 
 signals:
     void frameCaptured(cv::Mat *data);
-    void fpsChanged(int fps);
+    void fpsChanged(float fps);
     void videoSaved(QString name);
 
 private:
@@ -58,7 +58,7 @@ private:
 
     // FPS calculating
     bool fps_calculating;
-    int fps;
+    float fps;
 
     // video saving
     int frame_width, frame_height;

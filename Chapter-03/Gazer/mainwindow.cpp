@@ -117,9 +117,10 @@ void MainWindow::showCameraInfo()
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
     QString info = QString("Available Cameras: \n");
 
-    foreach (const QCameraInfo &cameraInfo, cameras)
-        info += "  - " + cameraInfo.deviceName() + "\n";
-
+    foreach (const QCameraInfo &cameraInfo, cameras) {
+        info += "  - " + cameraInfo.deviceName() +  ": ";
+        info += cameraInfo.description() + "\n";
+    }
     QMessageBox::information(this, "Cameras", info);
 }
 
@@ -184,7 +185,7 @@ void MainWindow::updateFrame(cv::Mat *mat)
     imageView->setSceneRect(image.rect());
 }
 
-void MainWindow::updateFPS(int fps)
+void MainWindow::updateFPS(float fps)
 {
     mainStatusLabel->setText(QString("FPS of current camera is %1").arg(fps));
 }

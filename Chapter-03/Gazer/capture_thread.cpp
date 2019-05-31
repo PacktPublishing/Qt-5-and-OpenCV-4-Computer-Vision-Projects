@@ -9,7 +9,7 @@ CaptureThread::CaptureThread(int camera, QMutex *lock):
     running(false), cameraID(camera), videoPath(""), data_lock(lock)
 {
     fps_calculating = false;
-    fps = 0;
+    fps = 0.0;
 
     frame_width = frame_height = 0;
     video_saving_status = STOPPED;
@@ -23,7 +23,7 @@ CaptureThread::CaptureThread(QString videoPath, QMutex *lock):
     running(false), cameraID(-1), videoPath(videoPath), data_lock(lock)
 {
     fps_calculating = false;
-    fps = 0;
+    fps = 0.0;
 
     frame_width = frame_height = 0;
     video_saving_status = STOPPED;
@@ -88,7 +88,7 @@ void CaptureThread::calculateFPS(cv::VideoCapture &cap)
             cap >> tmp_frame;
     }
     int elapsed_ms = timer.elapsed();
-    fps = (int)(count_to_read / (elapsed_ms / 1000.0));
+    fps = count_to_read / (elapsed_ms / 1000.0);
     fps_calculating = false;
     emit fpsChanged(fps);
 }

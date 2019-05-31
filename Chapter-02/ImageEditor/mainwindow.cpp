@@ -10,8 +10,6 @@
 
 #include "mainwindow.h"
 
-using namespace cv;
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
     , fileMenu(nullptr)
@@ -219,13 +217,17 @@ void MainWindow::blurImage()
     QPixmap pixmap = currentImage->pixmap();
     QImage image = pixmap.toImage();
     image = image.convertToFormat(QImage::Format_RGB888);
-    Mat mat = Mat(
+    cv::Mat mat = cv::Mat(
         image.height(),
         image.width(),
         CV_8UC3,
         image.bits(),
         image.bytesPerLine());
-    blur(mat, mat, Size(8, 8));
+
+    cv::Mat tmp;
+    cv::blur(mat, tmp, cv::Size(8, 8));
+    mat = tmp;
+
     QImage image_blurred(
         mat.data,
         mat.cols,
@@ -285,7 +287,7 @@ void MainWindow::pluginPerform()
     QPixmap pixmap = currentImage->pixmap();
     QImage image = pixmap.toImage();
     image = image.convertToFormat(QImage::Format_RGB888);
-    Mat mat = Mat(
+    cv::Mat mat = cv::Mat(
         image.height(),
         image.width(),
         CV_8UC3,
