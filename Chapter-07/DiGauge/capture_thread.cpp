@@ -180,6 +180,9 @@ void decodeOutLayers(
 
 void distanceBirdEye(cv::Mat &frame, vector<cv::Rect> &cars)
 {
+    if(cars.empty())
+        return;
+
     vector<int> length_of_cars;
     vector<pair<int, int>> endpoints;
     vector<pair<int, int>> cars_merged;
