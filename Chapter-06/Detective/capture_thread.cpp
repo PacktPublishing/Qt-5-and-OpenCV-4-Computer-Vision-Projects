@@ -53,7 +53,7 @@ void CaptureThread::run() {
 #ifdef TIME_MEASURE
         int64 t1 = cv::getTickCount();
         double t = (t1-t0) * 1000 /cv::getTickFrequency();
-        qDebug() << "Decteing time on a single frame: " << t <<"ms";
+        qDebug() << "Detecting time on a single frame: " << t <<"ms";
 #endif
 
         cvtColor(tmp_frame, tmp_frame, cv::COLOR_BGR2RGB);
