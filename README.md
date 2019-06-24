@@ -1,6 +1,6 @@
 # Qt 5 and OpenCV 4 Computer Vision Projects
 
-<a href=link><img src="image link" alt="Qt 5 and OpenCV 4 Computer Vision Projects " height="256px" align="right"></a>
+<a href=link><img src="https://images-na.ssl-images-amazon.com/images/I/518P6OYe%2BhL._SX404_BO1,204,203,200_.jpg" alt="Qt 5 and OpenCV 4 Computer Vision Projects " height="256px" align="right"></a>
 
 This is the code repository for [Qt 5 and OpenCV 4 Computer Vision Projects](link), published by Packt.
 
@@ -21,7 +21,7 @@ Implement high-speed image filters on GPU with Open Graphics Library (OpenGL)
 
 If you feel this book is for you, get your [copy](https://www.amazon.com/dp/1789532582) today!
 
-<a href="https://www.packtpub.com/?utm_source=github&utm_medium=banner&utm_campaign=GitHubBanner"><img src="https://raw.githubusercontent.com/PacktPublishing/GitHub/master/GitHub.png" 
+<a href="https://www.packtpub.com/?utm_source=github&utm_medium=banner&utm_campaign=GitHubBanner"><img src="https://raw.githubusercontent.com/PacktPublishing/GitHub/master/GitHub.png"
 alt="https://www.packtpub.com/" border="5" /></a>
 
 ## Instructions and Navigations
@@ -29,7 +29,7 @@ All of the code is organized into folders. For example, Chapter02.
 
 The code will look like the following:
 ```
-QMenu *editMenu;
+         QMenu *editMenu;
          QToolBar *editToolBar;
          QAction *blurAction;
 ```
@@ -66,7 +66,7 @@ Click on the following link to see the Code in Action:
 
 ## Get to Know the Author
 **Zhuo Qingliang**
-(a.k.a. KDr2 online) is presently working at Beijing Paoding Technology Co. LTD., a start-up Fintech company in China that is dedicated to improving the financial industry by using artificial intelligence technologies. He has over 10 years’ experience in Linux, C, C++, Python, Perl, and Java development. He is interested in programming, doing consulting work, participating in and contributing to the open source community (of course, includes the Julia community).
+(a.k.a. @KDr2 online) is presently working at Beijing Paoding Technology Co. LTD., a start-up Fintech company in China that is dedicated to improving the financial industry by using artificial intelligence technologies. He has over 10 years’ experience in Linux, C, C++, Python, Perl, and Java development. He is interested in programming, doing consulting work, participating in and contributing to the open source community (of course, includes the Julia community).
 
 
 ## Other books by the authors
@@ -76,5 +76,3 @@ Click on the following link to see the Code in Action:
 
 ### Suggestions and Feedback
 [Click here](https://docs.google.com/forms/d/e/1FAIpQLSdy7dATC6QmEL81FIUuymZ0Wy9vH1jHkvpY57OiMeKGqib_Ow/viewform) if you have any feedback or suggestions.
-
-
