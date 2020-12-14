@@ -1,3 +1,8 @@
+## $5 Tech Unlocked 2021!
+[Buy and download this Book for only $5 on PacktPub.com](https://www.packtpub.com/product/qt-5-and-opencv-4-computer-vision-projects/9781789532586)
+-----
+*If you have read this book, please leave a review on [Amazon.com](https://www.amazon.com/gp/product/1789532582).     Potential readers can then use your unbiased opinion to help them make purchase decisions. Thank you. The $5 campaign         runs from __December 15th 2020__ to __January 13th 2021.__*
+
 # Qt 5 and OpenCV 4 Computer Vision Projects
 
 <a href=link><img src="https://images-na.ssl-images-amazon.com/images/I/518P6OYe%2BhL._SX404_BO1,204,203,200_.jpg" alt="Qt 5 and OpenCV 4 Computer Vision Projects " height="256px" align="right"></a>
